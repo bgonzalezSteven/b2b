@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: b2b_api
+    restart: always
+    ports:
+      - '5433:5432' #Cambiamos el puerto, en mi pc ya esta ejecutandose postgres en el puerto 5432 Manteniendo la logica de PUERTO_EXTERO:PUERTO_INTERNO
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: b2b
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:

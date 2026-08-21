@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Membreships {
+  id           String   @id @default(uuid())
+  name         String
+  price        Decimal  @db.Decimal(10, 2)
+  maxUsers     Int      @default(5)
+  hasKitchen   Boolean  @default(false)
+  hasInventory Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  tenants      Tenats[]
+}
+
+model Tenats {
+  id           String       @id @default(uuid())
+  name         String
+  email        String
+  slug         String       @unique
+  taxId        String
+  status       TenantStatus @default(ACTIVE)
+  membershipId String
+  membership   Membreships  @relation(fields: [membershipId], references: [id])
+  user         User[]
+}
+
+model Role {
+  id          String @id @default(uuid())
+  name        String @unique
+  description String
+  user        User[]
+}
+
+model User {
+  id           String  @id @default(uuid())
+  isSuperAdmin Boolean @default(false)
+  name         String
+  email        String  @unique
+  password     String
+  roleId       String
+  isActived    Boolean @default(true)
+  tenantId     String?
+  role         Role    @relation(fields: [roleId], references: [id])
+  tenant       Tenats? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  hashedRefreshToken String? //Almacenaremos el refresh token encriptado para poder validar si el usuario tiene un token valido o no
+}
+
+enum TenantStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}
+
+
+// Ya haz creado la bd, aprendido comandos nuevos y aparte integrado las semillas dentro de las tabla
+// Siguiente paso, iniciar con los endpoints de la api, crear las validaciones, midelware y demas para que el inicio de sesion sea seguro, junto con almacenamiento de cookies
