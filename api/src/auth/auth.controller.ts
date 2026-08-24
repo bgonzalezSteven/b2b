@@ -53,7 +53,7 @@ export class AuthController {
     @Req() req: any,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const userId = req.user.id;
+    const userId = req.user.sub; //Es el nombre que lleva dentro de nuestra inerfas strategy
     const refreshToken = req.user.refreshToken;
     const tokens = await this.authService.refreshToken(userId, refreshToken);
     this.setCookies(res, tokens.accessToken, tokens.refreshToken);

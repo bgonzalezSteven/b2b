@@ -47,7 +47,7 @@ model User {
   tenantId     String?
   role         Role    @relation(fields: [roleId], references: [id])
   tenant       Tenats? @relation(fields: [tenantId], references: [id], onDelete: Cascade)
-  hashedRefreshToken String? //Almacenaremos el refresh token encriptado para poder validar si el usuario tiene un token valido o no
+  refreshToken String? //Almacenaremos el refresh token encriptado para poder validar si el usuario tiene un token valido o no
 }
 
 enum TenantStatus {

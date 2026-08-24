@@ -25,6 +25,7 @@ export class AuthService {
       loginDto.password,
       user.password,
     );
+    console.log(loginDto, 'datos', isPasswordValid, user.password);
     if (!isPasswordValid) {
       throw new UnauthorizedException('Invalid credentials');
     }
@@ -50,12 +51,12 @@ export class AuthService {
     await this.prisma.user.updateMany({
       where: {
         id: userId,
-        hashedRefreshToken: {
+        refreshToken: {
           not: null,
         },
       },
       data: {
-        hashedRefreshToken: null,
+        refreshToken: null,
       },
     });
   }
@@ -64,13 +65,13 @@ export class AuthService {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
     });
-    if (!user || !user.hashedRefreshToken) {
+    if (!user || !user.refreshToken) {
       throw new UnauthorizedException('Access Denied');
     }
 
     const isRefreshTokenValid = await bcrypt.compare(
       refreshToken,
-      user.hashedRefreshToken,
+      user.refreshToken,
     );
     if (!isRefreshTokenValid) {
       throw new UnauthorizedException('Access Denied');
@@ -109,10 +110,10 @@ export class AuthService {
 
   // Almacenamiento del token de actualizacion en la BD
   async updateRefreshToken(userId: string, refreshToken: string) {
-    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    const refreshToken_has = await bcrypt.hash(refreshToken, 10);
     await this.prisma.user.update({
       where: { id: userId },
-      data: { refreshToken: hashedRefreshToken },
+      data: { refreshToken: refreshToken_has },
     });
   }
 }
