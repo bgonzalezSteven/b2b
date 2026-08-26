@@ -11,7 +11,7 @@ async function bootstrap() {
   app.enableCors({
     //Habilitamos el CORS para poder recibir peticiones desde el cliente
     origin: process.env.CLIENT_URL,
-    credentials: true,
+    credentials: true, //Validacion de credenciales de las cookies
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS', 'HEAD'],
   });
   //Validamos los datos que se envian desde el cliente, pasandolos por los DTO
@@ -23,7 +23,7 @@ async function bootstrap() {
     }),
   );
 
-  //Documentamos todo porque se me olvidara algo seguramente, cada iniciacion aqui es para el funcionamiento de validaciones y seguridad
+  // Documentamos todo porque se me olvidara algo seguramente, cada iniciacion aqui es para el funcionamiento de validaciones y seguridad
   // La idea principal es que se tenga total autonomia y total seguridad entre cada modulo, empresa, rol y demás de aqui vas a saltar a la creacion de los endspoint y configuracion de peticiones
   await app.listen(process.env.PORT ?? 3000);
 }
