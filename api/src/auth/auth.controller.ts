@@ -1,4 +1,12 @@
-import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/auth.dto';
 import type { Response, Request } from 'express';
@@ -61,5 +69,13 @@ export class AuthController {
       message: 'Token refreshed successfully',
       status: 200,
     };
+  }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get('me')
+  async getMe(@Req() req: any) {
+    // req.user.sub contiene el ID del usuario gracias al payload del Access Token
+    const userId = req.user.id;
+    return this.authService.getMe(userId);
   }
 }

@@ -10,7 +10,19 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
   ) {}
+  async getMe(userId: string) {
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
 
+    if (!user || !user.isActived) {
+      throw new UnauthorizedException('Usuario no encontrado o inactivo');
+    }
+
+    // Desestructuramos para excluir información sensible antes de enviarla al frontend
+    const { password, refreshToken, ...userData } = user;
+    return userData;
+  }
   async login(loginDto: LoginDto) {
     const user = await this.prisma.user.findUnique({
       where: { email: loginDto.email },

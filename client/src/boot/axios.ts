@@ -23,7 +23,7 @@ declare module 'axios' {
 // OJO ES UNA PRUEBA; SI NO FUNCIONA; VOLVEMOS A LO ANTIGUO XD
 
 const api: AxiosInstance = axios.create({
-  baseURL: process.env.baseUrl || 'http://localhost:3000',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000',
   withCredentials: true, // Aqui es donde cambiamos del JWt tradicional al uso de cookies
   headers: {
     'Content-Type': 'application/json',
@@ -64,6 +64,9 @@ export default defineBoot(({ router, app }) => {
     async (error: AxiosError<{ message?: string | string[] }>) => {
       const originalRequest = error.config as typeof error.config & { _retry?: boolean };
       // Validamos el error 401 que no viene de un login o refresh
+      if (originalRequest?.meta?.skipErrorNotify) {
+        return Promise.reject(error);
+      }
       if (
         error.response?.status === 401 &&
         !originalRequest._retry &&
@@ -109,11 +112,11 @@ export default defineBoot(({ router, app }) => {
           : rawMessaage || 'Ocurrio un error inesperado';
         const message = originalRequest?.meta?.errorMsg || apiMsg || 'Ayuda, no sé que paso';
         //Si la peticion viene del login, no mostramos nadita
-        if (!originalRequest.url?.includes('/auth/login')) {
+        if (originalRequest.url?.includes('/auth/login')) {
           Notify.create({
-            type: 'negative',
+            type: 'warning',
             message,
-            position: 'top-right',
+            position: 'top',
           });
         }
       }

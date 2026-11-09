@@ -16,11 +16,14 @@
   },
   "dependencies": {
     "@quasar/extras": "^2.0.4",
+    "@vuelidate/core": "^2.0.3",
+    "@vuelidate/validators": "^2.0.4",
     "axios": "^1.20.0",
     "pinia": "^4.0.2",
     "quasar": "^2.27.0",
     "vue": "^3.5.22",
-    "vue-router": "^5.0.6"
+    "vue-router": "^5.0.6",
+    "vuesax-alpha": "^0.2.0-beta.80"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

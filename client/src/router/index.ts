@@ -6,17 +6,9 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
+import { useAuthStore } from '../stores/auth.store';
 
-/*
- * If not building with SSR mode, you can
- * directly export the Router instantiation;
- *
- * The function below can be async too; either use
- * async/await or return a Promise which resolves
- * with the Router instance.
- */
-
-export default defineRouter((/* { store, ssrContext } */) => {
+export default defineRouter(({ store }) => {
   const createHistory = import.meta.env.QUASAR_SERVER
     ? createMemoryHistory
     : import.meta.env.QUASAR_VUE_ROUTER_MODE === 'history'
@@ -26,14 +18,39 @@ export default defineRouter((/* { store, ssrContext } */) => {
   const Router = createRouter({
     scrollBehavior: () => ({ left: 0, top: 0 }),
     routes,
-
-    // Leave this as is and make changes in quasar.conf.js instead!
-    // quasar.conf.js -> build -> vueRouterMode
-    // quasar.conf.js -> build -> publicPath
     history: createHistory(import.meta.env.QUASAR_VUE_ROUTER_BASE),
   });
 
-  // enable HMR for it
+  let isInitialAuthCheckDone = false;
+
+  Router.beforeEach(async (to) => {
+    // Ya no necesitamos 'from' ni 'next'
+    const authStore = useAuthStore(store);
+
+    if (!isInitialAuthCheckDone) {
+      await authStore.checkAuth();
+      isInitialAuthCheckDone = true;
+    }
+
+    const requiresAuth = to.meta.requiresAuth;
+    const requiresGuest = to.meta.requiresGuest;
+
+    // CASO A: Ruta protegida sin sesión -> Redirige al login con retorno pendiente
+    if (requiresAuth && !authStore.isAuthenticated) {
+      return {
+        path: '/auth/login',
+        query: { redirect: to.fullPath },
+      };
+    }
+
+    // CASO B: Ruta de invitado (login) con sesión activa -> Redirige al Dashboard
+    if (requiresGuest && authStore.isAuthenticated) {
+      return { path: '/' };
+    }
+
+    // Si todo está bien, simplemente no retornamos nada (permite el paso)
+  });
+
   if (import.meta.hot) {
     handleHotUpdate(Router);
   }
